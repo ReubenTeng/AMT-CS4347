@@ -2,7 +2,8 @@ import "./App.css";
 import React, { useRef } from "react";
 import MicRecorder from "mic-recorder-to-mp3";
 import PianoRoll from "react-piano-roll";
-import { getDefaultMidi } from "./APIService";
+import ReactDOM from "react-dom";
+import MidiPlayer from "react-midi-player";
 
 // const defaultMidi =
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
@@ -16,9 +17,8 @@ const browserSupportsMedia = () => {
     );
 };
 
-// let midiParser = new MidiParser();
-// set default displayed midi
 class UploadFilePage extends React.Component {
+    midi_src;
     constructor(props) {
         super(props);
         this.state = {
@@ -72,11 +72,23 @@ class UploadFilePage extends React.Component {
                 this.setState({
                     blobURL,
                     isRecording: false,
-                    isFileUploaded: true,
+                    isFileUploaded: false,
                 });
             })
             .catch((e) => console.log(e));
     };
+
+    readMIDIFile(event) {
+        this.midi_src = URL.createObjectURL(event.target.files[0]);
+        ReactDOM.render(
+            <MidiPlayer src={this.midi_src} />,
+            document.getElementById("midi-player")
+        );
+    }
+
+    log(thing) {
+        console.log(thing);
+    }
 
     render() {
         if (!this.state.isFileUploaded) {
@@ -111,16 +123,30 @@ class UploadFilePage extends React.Component {
                         {/* right column */}
                         <div>
                             <h1>Upload a file</h1>
-                            <input type="file" accept="audio/*" />
+                            <input
+                                type="file"
+                                onChange={(event) => {
+                                    this.readMIDIFile(event);
+                                }}
+                            />
+                            {/* accept="audio/*" /> */}
                             <button
-                                onClick={() =>
-                                    this.setState({ isFileUploaded: true })
-                                }
+                                onClick={(event) => {
+                                    this.setState({ isFileUploaded: true });
+                                }}
                             >
                                 Upload
                             </button>
                         </div>
                     </div>
+                    <div
+                        id="midi-player"
+                        style={{
+                            margin: "auto",
+                            textAlign: "center",
+                            marginTop: "40px",
+                        }}
+                    ></div>
                 </div>
             );
         } else {
