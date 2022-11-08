@@ -1,7 +1,9 @@
 #spleeter: https://github.com/deezer/spleeter
+#omnizart: https://pypi.org/project/omnizart/
 
 import os
 import subprocess
+from spleeter.separator import Separator
 
 def separate(file):
     """Separate the audio file into vocals and accompaniment"""
@@ -16,8 +18,12 @@ def separate(file):
     # run demucs
     subprocess.run(["spleeter", "separate", "-p" , "spleeter:2stems", "-o",  "output", "temp.wav"])
 
+    # preprocess data
+
+
     # read output
     vocals = open("output/temp/vocals.wav", "rb").read()
+
     # delete temp files
     os.remove("temp.wav")
     os.rmdir("output/temp")
