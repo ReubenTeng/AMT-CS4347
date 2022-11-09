@@ -19,6 +19,7 @@ const browserSupportsMedia = () => {
 
 class UploadFilePage extends React.Component {
     midi_src;
+    youtube_src;
     constructor(props) {
         super(props);
         this.state = {
@@ -86,8 +87,8 @@ class UploadFilePage extends React.Component {
         );
     }
 
-    log(thing) {
-        console.log(thing);
+    sendYoutubeLink() {
+        console.log(this.youtube_src);
     }
 
     render() {
@@ -120,7 +121,7 @@ class UploadFilePage extends React.Component {
                                 controls="controls"
                             />
                         </div>
-                        {/* right column */}
+                        {/* mid column */}
                         <div>
                             <h1>Upload a file</h1>
                             <input
@@ -136,6 +137,24 @@ class UploadFilePage extends React.Component {
                                 }}
                             >
                                 Upload
+                            </button>
+                        </div>
+                        {/* mid column - download audio from youtube*/}
+                        <div>
+                            <h1>Download audio from youtube</h1>
+                            <input
+                                type="text"
+                                placeholder="Enter youtube link"
+                                onChange={(event) => {
+                                    this.youtube_src = event.target.value;
+                                }}
+                            />
+                            <button
+                                onClick={() => {
+                                    this.sendYoutubeLink();
+                                }}
+                            >
+                                Download
                             </button>
                         </div>
                     </div>
