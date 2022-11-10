@@ -1,0 +1,6 @@
+ffmpeg-python
+torch
+librosa
+spleeter
+soundfile
+youtube_dl
