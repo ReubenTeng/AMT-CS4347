@@ -3,6 +3,10 @@
 
 test/*
 pretrained_models/*
+vocal/*
+split/*
+merged-res/*
+save/*
 
 # vscode
 *.code-workspace
