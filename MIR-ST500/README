@@ -4,7 +4,7 @@ We evaluate MusicYolo only on the "test" set since the train set was used to tra
 
 To download requirements, use:
 > pip install -r requirements.txt<br>
-Note: Some other requirements have been excluded as they have already been downloaded when using MusicYOLO. Also note that 
+Note: This step can be skipped when using MusicYOLO since the requirements should have already been downloaded. Also note that 
 Spleeter's version of tensorflow and numpy may be incompatible with other parts of the project. If errors arise, use spleeter in 
 a different environment/uninstall numpy and tensorflow before installing spleeter.
 
@@ -26,9 +26,9 @@ Step1. Move the extracted vocal files into their own directory "vocal"
 Step2. Split the audio into 35 second chunks
 > python splitwav.py vocal split
 
-Step3. Onset/offset detection (use musicyolo1.pth) (From MusicYOLO directory)
+Step3. Onset/offset detection (use musicyolo1.pth) (From MusicYOLO directory) (Create "save" directory in MIR-ST500 first)
 ```shell
-python3 tools/predict.py -f exps/example/custom/yolox_singing.py -c models/musicyolo1.pth --audiodir $SPLIT_PATH --savedir $SAVE_PATH --ext .wav --device gpu
+python3 tools/predict.py -f exps/example/custom/yolox_singing.py -c models/musicyolo1.pth --audiodir "../MIR-ST500/split" --savedir "../MIR-ST500/save"  --ext .wav --device gpu
 ```
 Step4. Merge results
 > python mergeres.py vocal save merged-res
