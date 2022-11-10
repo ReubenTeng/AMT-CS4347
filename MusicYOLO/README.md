@@ -19,7 +19,7 @@ cd MusicYOLO
 pip3 install -U pip && pip3 install -r requirements.txt
 pip3 install -v -e .  # or  python3 setup.py develop
 ```
-Step2. Install apex.
+Step2. Install apex. (Skipped and apex dir removed since we are not retraining the model)
 
 ```shell
 # skip this step if you don't want to train model.
