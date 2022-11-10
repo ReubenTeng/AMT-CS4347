@@ -9,7 +9,7 @@ This will download 500 songs from Youtube automatically. Song id #1~#400 (traini
 
 And then, we have to use an SVS program to extract vocal, and write the vocal file to "Vocal.wav". Here, do_spleeter.py uses Spleeter to do the job.
 
-We evaluate only on the "test" set.
+We evaluate only on the "test" set since the train set was used to train the model musicyolo1.pth.
 
 Original README:
 MIR-ST500 dataset
