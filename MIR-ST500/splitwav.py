@@ -20,5 +20,6 @@ def split_one_song(source_file_path, dest_folder):
 if __name__=='__main__':
     vox_dir = sys.argv[1] # vocals already separated from song
     split_dir = sys.argv[2]
+    os.makedirs(split_dir) 
     for vox_wav in os.listdir(vox_dir):
         split_one_song(os.path.join(vox_dir, vox_wav), split_dir)
