@@ -6,7 +6,8 @@ To download the dataset, use:
 > pip install -r requirements.txt<br>
 > python get_youtube.py MIR-ST500_link.json train test
 
-This will download 500 songs from Youtube automatically. Song id #1~#400 (training set) will be saved to "train/", #401~#500(test set) will be saved to "test/"
+This will download 500 songs from Youtube automatically. Song id #1~#400 (training set) will be saved to "train/", #401~#500(test set) will be saved to "test/". <br>
+Note: spleeter's version of tensorflow and numpy may be incompatible with other projects.
 
 > python do_spleeter.py train/<br>
 > python do_spleeter.py test/

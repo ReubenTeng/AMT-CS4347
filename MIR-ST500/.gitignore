@@ -1,0 +1,11 @@
+### Linux ###
+*~
+
+test/*
+
+# vscode
+*.code-workspace
+.vscode
+
+# vim
+.vim
