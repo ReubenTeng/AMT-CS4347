@@ -46,14 +46,14 @@ Step2. Onset/offset detection (use musicyolo2.pth)
 ```shell
 python3 tools/predict.py -f exps/example/custom/yolox_singing.py -c models/musicyolo2.pth --audiodir $SSVD_TEST_SET_PATH --savedir $SAVE_PATH --ext .flac --device gpu
 ```
-`$SSVD_TEST_SET_PATH` refers to the directory where the audio files and .txt files to be predicted are stored.
+`$SSVD_TEST_SET_PATH` refers to the directory where the audio files and .txt files to be predicted are stored.<br />
 `$SAVE_PATH` refers to an empty directory to save the results of prediction.
 
 Step3. Evaluate
 ```shell
 python3 tools/note_eval.py --label $SSVD_TEST_SET_PATH --result $SAVE_PATH --offset
 ```
-`$SSVD_TEST_SET_PATH` refers to the directory where the audio files and .txt files to be predicted are stored.
+`$SSVD_TEST_SET_PATH` refers to the directory where the audio files and .txt files to be predicted are stored.<br />
 `$SAVE_PATH` refers to the "res" directory — within the previous steps' `$SAVE_PATH` — which is generated during prediction.
 
 Similar process for ISMIR2014 dataset.
