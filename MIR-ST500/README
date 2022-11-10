@@ -1,5 +1,6 @@
 This directory is related to the named dataset below. Files are adapted from the original project's repository.
 To download the dataset, use:
+> pip install -r requirements.txt<br>
 > python get_youtube.py MIR-ST500_link.json train test
 
 This will download 500 songs from Youtube automatically. Song id #1~#400 (training set) will be saved to "train/", #401~#500(test set) will be saved to "test/"
@@ -10,6 +11,29 @@ This will download 500 songs from Youtube automatically. Song id #1~#400 (traini
 And then, we have to use an SVS program to extract vocal, and write the vocal file to "Vocal.wav". Here, do_spleeter.py uses Spleeter to do the job.
 
 We evaluate only on the "test" set since the train set was used to train the model musicyolo1.pth.
+
+To get the correct format and directories for prediction and evaluation, we do the inference with the following commands:
+
+Step1. Move the extracted vocal files into their own directory "vocal"
+> python movefiles.py
+
+Step2. Split the audio into 35 second chunks
+> python splitwav.py vocal split
+
+Step3. Onset/offset detection (use musicyolo1.pth) (From MusicYOLO directory)
+```shell
+python3 tools/predict.py -f exps/example/custom/yolox_singing.py -c models/musicyolo1.pth --audiodir $SPLIT_PATH --savedir $SAVE_PATH --ext .wav --device gpu
+```
+Step4. Merge results
+> python mergeres.py vocal save merged-res
+
+Step4. Get correct label files
+> python jsontotxt.py
+
+Step6. Evaluate
+```shell
+python3 tools/note_eval.py --label $MIR_ST500_TEST_LABEL_PATH --result $MERGE_PATH --offset
+```
 
 Original README:
 MIR-ST500 dataset

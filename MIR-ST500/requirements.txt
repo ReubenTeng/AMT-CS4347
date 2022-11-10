@@ -1,0 +1,7 @@
+ffmpeg-python
+librosa
+spleeter
+soundfile
+youtube_dl
+numpy
+pydub

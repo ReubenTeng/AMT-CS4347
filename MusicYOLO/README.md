@@ -64,7 +64,7 @@ Similar process for ISMIR2014 dataset.
 
 Since MIR-ST500 dataset is a mixture of vocals and accompaniments, we need to separate vocals and accompaniments with spleeter first. Besides, since the singing duration of each audio in MIR-ST500 dataset is too long, we will first cut each audio into short audios of about 35s for on/offset detection.<br />
 **Note from project team:** Since split_mst.py does not work for us, we have created our own method for splitting the audio and
-merging the results in splitwav.py and mergeres.py.
+merging the results in splitwav.py and mergeres.py. Go to the MIR-ST500 directory for more information.
 
 Step1. Audio source seperation
 ```shell
