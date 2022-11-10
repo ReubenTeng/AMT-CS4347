@@ -132,6 +132,7 @@ dmypy.json
 pretrained_models/*
 
 # Results
-save/*
-split/*
-merged-res/*
+AMT-Prototype/save/*
+AMT-Prototype/split/*
+AMT-Prototype/merged-res/*
+AMT-Prototype/vocal.wav
