@@ -36,11 +36,13 @@ cd cocoapi/PythonAPI && pip3 install -v .
 
 ## Inference
 
-Download the pretrained musicyolo1 and musicyolo2 models described in our paper. Put these two models under the models folder. The models are stored in BaiduYun https://pan.baidu.com/s/1TbE36ydi-6EZXwxo5DwfLg?pwd=1234 code: 1234
+Download the pretrained musicyolo1 and musicyolo2 models described in our paper. Put these two models under the models folder. The models are stored in BaiduYun https://pan.baidu.com/s/1TbE36ydi-6EZXwxo5DwfLg?pwd=1234 code: 1234 <br />
+**Note from project team:** create your own "models" directory under the MusicYOLO directory to follow the above instruction.
 
 ### SSVD & ISMIR2014
 
-Step1. Download SSVD-v2.0 from https://github.com/xk-wang/SSVD-v2.0
+Step1. Download SSVD-v2.0 from https://github.com/xk-wang/SSVD-v2.0 <br />
+**Note from project team:** we cloned the SSVD-v2.0 directory and create a new "save" directory under its root directory.
 
 Step2. Onset/offset detection (use musicyolo2.pth)
 ```shell
