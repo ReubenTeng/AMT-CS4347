@@ -22,7 +22,7 @@ def separate_vocal(wav_file_path) :
     mix_path = wav_file_path
     vocal_path = "vocal.wav"
 
-    print("Separating ", wav_file_name, "\n")
+    print("Separating", wav_file_name, "...\n")
 
     y, sr = librosa.core.load(mix_path, sr=None, mono=True)
     if sr != 44100:
@@ -40,6 +40,7 @@ def separate_vocal(wav_file_path) :
     return vocal_path
 
 def segment_one_song(vocal_path, split_dir, save_dir, merged_res_dir):
+    print("Segmenting...\n")
     split_one_song(vocal_path, split_dir)
 
     # predict
@@ -59,15 +60,18 @@ def transcribe_one_song(wav_file_path):
 
     # clear directories
     split_dir = "split"
-    shutil.rmtree(split_dir)
+    if (os.path.exists(split_dir)):
+        shutil.rmtree(split_dir)
     os.mkdir(split_dir)
 
     save_dir = "save"
-    shutil.rmtree(save_dir)
+    if (os.path.exists(save_dir)):
+        shutil.rmtree(save_dir)
     os.mkdir(save_dir)
 
     merged_res_dir = "merged-res"
-    shutil.rmtree(merged_res_dir)
+    if (os.path.exists(merged_res_dir)):
+        shutil.rmtree(merged_res_dir)
     os.mkdir(merged_res_dir)
 
     note_segmentation_path = segment_one_song(vocal_path, split_dir, save_dir, merged_res_dir)
@@ -85,6 +89,7 @@ def transcribe_one_song(wav_file_path):
         offsets.append(offset)
     note_file.close()
 
+    print("Deriving pitch...\n")
     # pitch contour
     y, sr = librosa.load(vocal_path)
     f0, voiced_flag, voiced_probs = librosa.pyin(y, fmin=librosa.note_to_hz('C0'), fmax=librosa.note_to_hz('B8'))
@@ -128,5 +133,7 @@ def transcribe_one_song(wav_file_path):
 
 if __name__=='__main__':
     result_df = transcribe_one_song("sample.wav")
-    arr = result_df.to_numpy()
-    print(arr)
+
+    result = result_df.to_json(orient="values")
+    with open("result.json", "w") as result_file:
+        result_file.write(result)
