@@ -1,4 +1,7 @@
 This directory is related to the named dataset below. Files are adapted from the original project's repository.
+
+We evaluate MusicYolo only on the "test" set since the train set was used to train the model musicyolo1.pth. For evaluation, we can comment out code and skip instructions for the train set.
+
 To download the dataset, use:
 > pip install -r requirements.txt<br>
 > python get_youtube.py MIR-ST500_link.json train test
@@ -9,8 +12,6 @@ This will download 500 songs from Youtube automatically. Song id #1~#400 (traini
 > python do_spleeter.py test/
 
 And then, we have to use an SVS program to extract vocal, and write the vocal file to "Vocal.wav". Here, do_spleeter.py uses Spleeter to do the job.
-
-We evaluate only on the "test" set since the train set was used to train the model musicyolo1.pth.
 
 To get the correct format and directories for prediction and evaluation, we do the inference with the following commands:
 
