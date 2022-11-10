@@ -1,7 +1,5 @@
 ffmpeg-python
-librosa
 spleeter
 soundfile
 youtube_dl
-numpy==1.19.5
 pydub
