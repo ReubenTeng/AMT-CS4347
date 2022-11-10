@@ -5,7 +5,6 @@ import os
 if __name__=='__main__':
     dataset_dir = "test"
     vocal_dir = "vocal"
-    os.makedirs(dataset_dir) 
     os.makedirs(vocal_dir) 
 
     for test_dir in os.listdir(dataset_dir):
