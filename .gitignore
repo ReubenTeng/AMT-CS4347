@@ -136,4 +136,5 @@ AMTYolo/save/*
 AMTYolo/split/*
 AMTYolo/merged-res/*
 AMTYolo/vocal.wav
-AMTYolo/result.json
+AMTYolo/trans.json
+AMTYolo/trans.mid
