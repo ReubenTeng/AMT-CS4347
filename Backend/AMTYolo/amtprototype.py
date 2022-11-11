@@ -9,6 +9,8 @@ import pandas as pd
 import math
 import mido
 import time
+import json
+import tqdm
 
 from splitwav import split_one_song
 from mergeres import merge_one_song_res
@@ -47,15 +49,17 @@ def segment_one_song(vocal_path, split_dir, save_dir, merged_res_dir):
     # predict
     predict_cmd = ("python tools/predict.py -f exps/example/custom/yolox_singing.py -c" 
         "models/musicyolo1.pth --audiodir " + "\"../" + split_dir + "\" --savedir \"../"+ save_dir + "\" "
-        "--ext .wav --device cpu")
+        "--ext .wav --device gpu")
     args = shlex.split(predict_cmd)
     subprocess.run(args, cwd="MusicYOLO")
+
     result_path = merge_one_song_res(vocal_path, os.path.join(save_dir, "res"), merged_res_dir)
 
     return result_path
 
 # convert to midi, taken from assignment 1
 def notes2mid(notes):
+    print(notes)
     mid = mido.MidiFile()
     track = mido.MidiTrack()
     mid.tracks.append(track)
@@ -83,7 +87,7 @@ def notes2mid(notes):
 
     return mid
 
-def transcribe_one_song(wav_file_path):
+def predict_one_song(wav_file_path):
     vocal_path = separate_vocal(wav_file_path)
     # vocal_path = "vocal.wav"
 
@@ -150,29 +154,60 @@ def transcribe_one_song(wav_file_path):
         median_freq = np.median(freqs)
 
         if (math.isnan(median_freq) or len(freqs) <= 0):
-            notes.append(median_freq)
+            notes.append(pd.NaT)
         else:
             notes.append(librosa.hz_to_midi(median_freq))
 
     result_df = pd.DataFrame(list(zip(onsets, offsets, notes)), columns=["Onset", "Offset", "Note"])
+    result_df = result_df.dropna()
 
     return result_df
 
-def get_vocal_midi(song_path):
+def transcribe_one_song(input_audio_path, midi_path, json_path):
     startTime = time.time()
-    result_df = transcribe_one_song(song_path)
+    
+    result_df = predict_one_song(input_audio_path)
     pd.set_option('display.max_rows', None)
+    print(result_df)
 
     result = result_df.to_json(orient="values")
-    with open("trans.json", "w") as result_file:
+    with open(json_path, "w") as result_file:
         result_file.write(result)
 
     list_of_rows = result_df.to_numpy().tolist()
     mid = notes2mid(list_of_rows)
-    mid.save("trans.mid")
+    mid.save(midi_path)
     
     executionTime = (time.time() - startTime)
-    print('Transcription time in seconds: ' + str(executionTime))
+    print(input_audio_path + ' transcription time in seconds: ' + str(executionTime))
+
+    return list_of_rows
 
 if __name__=='__main__':
-    get_vocal_midi("sample.wav")
+    # to_transcribe_file = "sample.mp3"
+    # midi_path = "trans.mid"
+    # json_path = "trans.json"
+
+    # transcribe_one_song(to_transcribe_file, midi_path, json_path)
+
+    # predict for MIR-ST500
+    results = {}
+
+    mst_dir = os.path.join("MIR-ST500", "test")
+    for song_dir in os.listdir(mst_dir):
+        if int(song_dir) < 401 or int(song_dir) > 410: continue
+        print("Predicting", song_dir)
+
+        to_transcribe_file = os.path.join(mst_dir, song_dir, "Mixture.mp3")
+        midi_path = os.path.join(mst_dir, song_dir, "trans.mid")
+        json_path = os.path.join(mst_dir, song_dir, "trans.json")
+
+        list_of_rows = transcribe_one_song(to_transcribe_file, midi_path, json_path)
+
+        results[song_dir] = list_of_rows
+
+    results.sort()
+    with open("annotations.json", 'w') as f:
+        output_string = json.dumps(results)
+        f.write(output_string)
+    
