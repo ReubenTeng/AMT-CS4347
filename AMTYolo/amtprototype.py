@@ -7,7 +7,8 @@ import shlex
 import shutil
 import pandas as pd
 import math
-from decimal import Decimal
+import mido
+import time
 
 from splitwav import split_one_song
 from mergeres import merge_one_song_res
@@ -53,6 +54,36 @@ def segment_one_song(vocal_path, split_dir, save_dir, merged_res_dir):
     result_path = merge_one_song_res(vocal_path, os.path.join(save_dir, "res"), merged_res_dir)
 
     return result_path
+
+# convert to midi, taken from assignment 1
+def notes2mid(notes):
+    print(notes)
+    mid = mido.MidiFile()
+    track = mido.MidiTrack()
+    mid.tracks.append(track)
+    mid.ticks_per_beat = 480
+    new_tempo = mido.bpm2tempo(120.0)
+
+    track.append(mido.MetaMessage('set_tempo', tempo=new_tempo))
+    track.append(mido.Message('program_change', program=0, time=0))
+
+    cur_total_tick = 0
+
+    for note in notes:
+        if note[2] == 0:
+            continue
+        note[2] = int(round(note[2]))
+
+        ticks_since_previous_onset = int(mido.second2tick(note[0], ticks_per_beat=480, tempo=new_tempo))
+        ticks_current_note = int(mido.second2tick(note[1]-0.0001, ticks_per_beat=480, tempo=new_tempo))
+        note_on_length = ticks_since_previous_onset - cur_total_tick
+        note_off_length = ticks_current_note - note_on_length - cur_total_tick
+
+        track.append(mido.Message('note_on', note=note[2], velocity=100, time=note_on_length))
+        track.append(mido.Message('note_off', note=note[2], velocity=100, time=note_off_length))
+        cur_total_tick = cur_total_tick + note_on_length + note_off_length
+
+    return mid
 
 def transcribe_one_song(wav_file_path):
     vocal_path = separate_vocal(wav_file_path)
@@ -126,14 +157,23 @@ def transcribe_one_song(wav_file_path):
             notes.append(librosa.hz_to_midi(median_freq))
 
     result_df = pd.DataFrame(list(zip(onsets, offsets, notes)), columns=["Onset", "Offset", "Note"])
-    pd.set_option('display.max_rows', None)
-    print(result_df)
 
     return result_df
 
 if __name__=='__main__':
+    startTime = time.time()
     result_df = transcribe_one_song("sample.wav")
+    pd.set_option('display.max_rows', None)
+    print(result_df)
 
     result = result_df.to_json(orient="values")
-    with open("result.json", "w") as result_file:
+    with open("trans.json", "w") as result_file:
         result_file.write(result)
+
+    list_of_rows = result_df.to_numpy().tolist()
+    print("List of rows: ", list_of_rows)
+    mid = notes2mid(list_of_rows)
+    mid.save("trans.mid")
+    
+    executionTime = (time.time() - startTime)
+    print('Transcription time in seconds: ' + str(executionTime))
