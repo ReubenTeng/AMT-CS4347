@@ -1,11 +1,10 @@
 import "./App.css";
-import React, { useRef } from "react";
+import React from "react";
 import MicRecorder from "mic-recorder-to-mp3";
-import PianoRoll from "react-piano-roll";
 import ReactDOM from "react-dom";
 import MidiPlayer from "react-midi-player";
+import { separate, separate_by_youtube } from "./APIService";
 
-// const defaultMidi =
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 const browserSupportsMedia = () => {
@@ -19,6 +18,7 @@ const browserSupportsMedia = () => {
 
 class UploadFilePage extends React.Component {
     midi_src;
+    sound_src = "";
     youtube_src;
     constructor(props) {
         super(props);
@@ -26,7 +26,6 @@ class UploadFilePage extends React.Component {
             isRecording: false,
             blobURL: "",
             isBlocked: false,
-            isFileUploaded: false,
         };
         this.myRef = React.createRef();
         this.playbackRef = this.myRef;
@@ -37,6 +36,21 @@ class UploadFilePage extends React.Component {
                 this.playbackRef.current.seek("0:0:0");
             }
         });
+    }
+
+    readRecording(blob) {
+        this.sound_src = new File([blob], "recording.mp3");
+
+        ReactDOM.render(
+            <button
+                onClick={(event) => {
+                    this.uploadFile();
+                }}
+            >
+                Upload
+            </button>,
+            document.getElementById("upload-button")
+        );
     }
 
     componentDidMount() {
@@ -69,15 +83,34 @@ class UploadFilePage extends React.Component {
         Mp3Recorder.stop()
             .getMp3()
             .then(([buffer, blob]) => {
+                // read blob as bytes
+                this.readRecording(blob);
                 const blobURL = URL.createObjectURL(blob);
                 this.setState({
                     blobURL,
                     isRecording: false,
-                    isFileUploaded: false,
                 });
             })
             .catch((e) => console.log(e));
     };
+
+    readFile(event) {
+        this.sound_src = event.target.files[0];
+        ReactDOM.render(
+            <button
+                onClick={(event) => {
+                    this.uploadFile();
+                }}
+            >
+                Upload
+            </button>,
+            document.getElementById("upload-button")
+        );
+    }
+
+    uploadFile() {
+        this.midi_src = separate(this.sound_src);
+    }
 
     readMIDIFile(event) {
         this.midi_src = URL.createObjectURL(event.target.files[0]);
@@ -88,110 +121,83 @@ class UploadFilePage extends React.Component {
     }
 
     sendYoutubeLink() {
-        console.log(this.youtube_src);
+        this.midi_src = separate_by_youtube(this.youtube_src);
     }
 
     render() {
-        if (!this.state.isFileUploaded) {
-            return (
-                <div>
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-evenly",
-                        }}
-                    >
-                        {/* left column */}
-                        <div>
-                            <h1>Record your own voice</h1>
-                            <button
-                                onClick={this.start}
-                                disabled={this.state.isRecording}
-                            >
-                                Start
-                            </button>
-                            <button
-                                onClick={this.stop}
-                                disabled={!this.state.isRecording}
-                            >
-                                Stop
-                            </button>
-                            <audio
-                                src={this.state.blobURL}
-                                controls="controls"
-                            />
-                        </div>
-                        {/* mid column */}
-                        <div>
-                            <h1>Upload a file</h1>
-                            <input
-                                type="file"
-                                onChange={(event) => {
-                                    this.readMIDIFile(event);
-                                }}
-                            />
-                            {/* accept="audio/*" /> */}
-                            <button
-                                onClick={(event) => {
-                                    this.setState({ isFileUploaded: true });
-                                }}
-                            >
-                                Upload
-                            </button>
-                        </div>
-                        {/* mid column - download audio from youtube*/}
-                        <div>
-                            <h1>Download audio from youtube</h1>
-                            <input
-                                type="text"
-                                placeholder="Enter youtube link"
-                                onChange={(event) => {
-                                    this.youtube_src = event.target.value;
-                                }}
-                            />
-                            <button
-                                onClick={() => {
-                                    this.sendYoutubeLink();
-                                }}
-                            >
-                                Download
-                            </button>
-                        </div>
+        return (
+            <div>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-evenly",
+                    }}
+                >
+                    {/* left column */}
+                    <div>
+                        <h1>Record your own voice</h1>
+                        <button
+                            onClick={this.start}
+                            disabled={this.state.isRecording}
+                        >
+                            Start
+                        </button>
+                        <button
+                            onClick={this.stop}
+                            disabled={!this.state.isRecording}
+                        >
+                            Stop
+                        </button>
+                        <audio src={this.state.blobURL} controls="controls" />
                     </div>
-                    <div
-                        id="midi-player"
-                        style={{
-                            margin: "auto",
-                            textAlign: "center",
-                            marginTop: "40px",
-                        }}
-                    ></div>
+                    {/* mid column */}
+                    <div>
+                        <h1>Upload a file</h1>
+                        <input
+                            type="file"
+                            onChange={(event) => {
+                                this.readFile(event);
+                            }}
+                            accept="audio/*"
+                        />
+                    </div>
+                    {/* right column - download audio from youtube*/}
+                    <div>
+                        <h1>Download audio from youtube</h1>
+                        <input
+                            type="text"
+                            placeholder="Enter youtube link"
+                            onChange={(event) => {
+                                this.youtube_src = event.target.value;
+                            }}
+                        />
+                        <button
+                            onClick={() => {
+                                this.sendYoutubeLink();
+                            }}
+                        >
+                            Download
+                        </button>
+                    </div>
                 </div>
-            );
-        } else {
-            return (
-                //display piano roll
-                <PianoRoll
-                    width={1200}
-                    height={660}
-                    zoom={6}
-                    resolution={2}
-                    gridLineColor={0x333333}
-                    blackGridBgColor={0x1e1e1e}
-                    whiteGridBgColor={0x282828}
-                    noteData={[
-                        ["0:0:0", "F5", ""],
-                        ["0:0:0", "C4", "2n"],
-                        ["0:0:0", "D4", "2n"],
-                        ["0:0:0", "E4", "2n"],
-                        ["0:2:0", "B4", "4n"],
-                        ["0:3:0", "A#4", "4n"],
-                        ["0:0:0", "F2", ""],
-                    ]}
-                    ref={this.playbackRef}
-                />
-            );
-        }
+                <div
+                    style={{
+                        margin: "auto",
+                        textAlign: "center",
+                        marginTop: "40px",
+                    }}
+                    id="upload-button"
+                ></div>
+                <div
+                    id="midi-player"
+                    style={{
+                        margin: "auto",
+                        textAlign: "center",
+                        marginTop: "40px",
+                    }}
+                ></div>
+            </div>
+        );
     }
 }
 
