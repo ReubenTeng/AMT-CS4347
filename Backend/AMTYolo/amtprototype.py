@@ -182,7 +182,7 @@ def transcribe_one_song(input_audio_path, midi_path, json_path):
 
 if __name__=='__main__':
     # to test 1 file:
-    # to_transcribe_file = "sample.mp3"
+    # to_transcribe_file = "sample.mp3" # replace with any test audio file (can be any audio file type)
     # midi_path = "trans.mid"
     # json_path = "trans.json"
 
