@@ -163,11 +163,11 @@ if __name__ == '__main__':
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--annotation_path', default='MIR-ST500/MIR-ST500_corrected.json')
-    parser.add_argument('--predicted_json_path', default='annotations.json')
+    parser.add_argument('--predicted_json_path', default='predictions401-430.json')
     parser.add_argument('--tolerance', default=0.05)
 
     args = parser.parse_args()
     my_eval = MirEval()
     my_eval.prepare_data(args.annotation_path, args.predicted_json_path)
     my_eval.accuracy(onset_tolerance=float(args.tolerance))
-
+    

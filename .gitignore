@@ -132,12 +132,12 @@ dmypy.json
 pretrained_models/*
 
 # Results
-AMTYolo/save/*
-AMTYolo/split/*
-AMTYolo/merged-res/*
-AMTYolo/vocal.wav
-AMTYolo/trans.json
-AMTYolo/trans.mid
-AMTYolo/sample.wav
-AMTYolo/sample.mp3
-AMTYolo/annotations.json
+Backend/AMTYolo/save/*
+Backend/AMTYolo/split/*
+Backend/AMTYolo/merged-res/*
+Backend/AMTYolo/vocal.wav
+Backend/AMTYolo/trans.json
+Backend/AMTYolo/trans.mid
+Backend/AMTYolo/sample.wav
+Backend/AMTYolo/sample.mp3
+Backend/AMTYolo/annotations.json

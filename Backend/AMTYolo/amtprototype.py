@@ -59,7 +59,6 @@ def segment_one_song(vocal_path, split_dir, save_dir, merged_res_dir):
 
 # convert to midi, taken from assignment 1
 def notes2mid(notes):
-    print(notes)
     mid = mido.MidiFile()
     track = mido.MidiTrack()
     mid.tracks.append(track)
@@ -167,8 +166,6 @@ def transcribe_one_song(input_audio_path, midi_path, json_path):
     startTime = time.time()
     
     result_df = predict_one_song(input_audio_path)
-    pd.set_option('display.max_rows', None)
-    print(result_df)
 
     result = result_df.to_json(orient="values")
     with open(json_path, "w") as result_file:
@@ -184,6 +181,7 @@ def transcribe_one_song(input_audio_path, midi_path, json_path):
     return list_of_rows
 
 if __name__=='__main__':
+    # to test 1 file:
     # to_transcribe_file = "sample.mp3"
     # midi_path = "trans.mid"
     # json_path = "trans.json"
@@ -195,7 +193,8 @@ if __name__=='__main__':
 
     mst_dir = os.path.join("MIR-ST500", "test")
     for song_dir in os.listdir(mst_dir):
-        if int(song_dir) < 401 or int(song_dir) > 410: continue
+        # put range of songs to predict, may need to predict in smaller batches if out of memory
+        if int(song_dir) < 401 or int(song_dir) > 430: continue
         print("Predicting", song_dir)
 
         to_transcribe_file = os.path.join(mst_dir, song_dir, "Mixture.mp3")
@@ -206,8 +205,8 @@ if __name__=='__main__':
 
         results[song_dir] = list_of_rows
 
-    results.sort()
-    with open("annotations.json", 'w') as f:
+        print("Done with", song_dir)
+
+    with open("predictions401-430.json", 'w') as f:
         output_string = json.dumps(results)
         f.write(output_string)
-    
