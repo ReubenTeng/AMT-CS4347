@@ -49,7 +49,7 @@ def segment_one_song(vocal_path, split_dir, save_dir, merged_res_dir):
     # predict
     predict_cmd = ("python tools/predict.py -f exps/example/custom/yolox_singing.py -c" 
         "models/musicyolo1.pth --audiodir " + "\"../" + split_dir + "\" --savedir \"../"+ save_dir + "\" "
-        "--ext .wav --device gpu")
+        "--ext .wav --device cpu")
     args = shlex.split(predict_cmd)
     subprocess.run(args, cwd="MusicYOLO")
 

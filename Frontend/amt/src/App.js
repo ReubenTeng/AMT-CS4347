@@ -1,5 +1,6 @@
 import "./App.css";
 import React from "react";
+import { Audio } from "react-loader-spinner";
 import MicRecorder from "mic-recorder-to-mp3";
 import ReactDOM from "react-dom";
 import MidiPlayer from "react-midi-player";
@@ -23,6 +24,7 @@ class UploadFilePage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: false,
             isRecording: false,
             blobURL: "",
             isBlocked: false,
@@ -46,6 +48,7 @@ class UploadFilePage extends React.Component {
                 onClick={(event) => {
                     this.uploadFile();
                 }}
+                disabled={this.loading}
             >
                 Upload
             </button>,
@@ -101,6 +104,7 @@ class UploadFilePage extends React.Component {
                 onClick={(event) => {
                     this.uploadFile();
                 }}
+                disabled={this.loading}
             >
                 Upload
             </button>,
@@ -108,93 +112,156 @@ class UploadFilePage extends React.Component {
         );
     }
 
-    uploadFile() {
-        this.midi_src = separate(this.sound_src);
+    async uploadFile() {
+        this.loading = true;
+        ReactDOM.render(
+            <Audio
+                height="240"
+                width="240"
+                color="#03a9f4"
+                ariaLabel="loading"
+                wrapperStyle
+                wrapperClass
+            />,
+            document.getElementById("load-spinner")
+        );
+        document.getElementById("content").style.display = "none";
+        let result = separate(this.sound_src);
+        this.readMIDIFile(await result);
+        ReactDOM.render(<div />, document.getElementById("load-spinner"));
+        document.getElementById("content").style.display = "";
+        this.loading = false;
     }
 
-    readMIDIFile(event) {
-        this.midi_src = URL.createObjectURL(event.target.files[0]);
+    readMIDIFile(midi_blob) {
+        // convert midi_blob to url
+        this.midi_src = URL.createObjectURL(midi_blob);
+
         ReactDOM.render(
-            <MidiPlayer src={this.midi_src} />,
+            <div>
+                <MidiPlayer src={this.midi_src} />
+                {/* button to download midi file */}
+                <div>
+                    <a href={this.midi_src} download="output.mid">
+                        <button>Download MIDI</button>
+                    </a>
+                </div>
+            </div>,
             document.getElementById("midi-player")
         );
     }
 
-    sendYoutubeLink() {
-        this.midi_src = separate_by_youtube(this.youtube_src);
+    async sendYoutubeLink() {
+        this.loading = true;
+        ReactDOM.render(
+            <Audio
+                height="240"
+                width="240"
+                color="#03a9f4"
+                ariaLabel="loading"
+                wrapperStyle
+                wrapperClass
+            />,
+            document.getElementById("load-spinner")
+        );
+        document.getElementById("content").style.display = "none";
+        let result = await separate_by_youtube(this.youtube_src);
+        this.readMIDIFile(await result);
+        ReactDOM.render(<div />, document.getElementById("load-spinner"));
+        document.getElementById("content").style.display = "";
+        this.loading = false;
     }
 
     render() {
         return (
             <div>
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-evenly",
-                    }}
-                >
-                    {/* left column */}
-                    <div>
-                        <h1>Record your own voice</h1>
-                        <button
-                            onClick={this.start}
-                            disabled={this.state.isRecording}
-                        >
-                            Start
-                        </button>
-                        <button
-                            onClick={this.stop}
-                            disabled={!this.state.isRecording}
-                        >
-                            Stop
-                        </button>
-                        <audio src={this.state.blobURL} controls="controls" />
+                <div id="content">
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-evenly",
+                        }}
+                    >
+                        {/* left column */}
+                        <div>
+                            <h1>Record your own voice</h1>
+                            <button
+                                onClick={this.start}
+                                disabled={
+                                    this.state.isRecording || this.loading
+                                }
+                            >
+                                Start
+                            </button>
+                            <button
+                                onClick={this.stop}
+                                disabled={
+                                    !this.state.isRecording || this.loading
+                                }
+                            >
+                                Stop
+                            </button>
+                            <audio
+                                src={this.state.blobURL}
+                                controls="controls"
+                            />
+                        </div>
+                        {/* mid column */}
+                        <div>
+                            <h1>Upload a file</h1>
+                            <input
+                                type="file"
+                                onChange={(event) => {
+                                    this.readFile(event);
+                                }}
+                                accept="audio/mp3"
+                                disabled={this.loading}
+                            />
+                        </div>
+                        {/* right column - download audio from youtube*/}
+                        <div>
+                            <h1>Download audio from youtube</h1>
+                            <input
+                                type="text"
+                                placeholder="Enter youtube link"
+                                onChange={(event) => {
+                                    this.youtube_src = event.target.value;
+                                }}
+                            />
+                            <button
+                                onClick={() => {
+                                    this.sendYoutubeLink();
+                                }}
+                                disabled={this.loading}
+                            >
+                                Download
+                            </button>
+                        </div>
                     </div>
-                    {/* mid column */}
-                    <div>
-                        <h1>Upload a file</h1>
-                        <input
-                            type="file"
-                            onChange={(event) => {
-                                this.readFile(event);
-                            }}
-                            accept="audio/*"
-                        />
-                    </div>
-                    {/* right column - download audio from youtube*/}
-                    <div>
-                        <h1>Download audio from youtube</h1>
-                        <input
-                            type="text"
-                            placeholder="Enter youtube link"
-                            onChange={(event) => {
-                                this.youtube_src = event.target.value;
-                            }}
-                        />
-                        <button
-                            onClick={() => {
-                                this.sendYoutubeLink();
-                            }}
-                        >
-                            Download
-                        </button>
-                    </div>
+                    <div
+                        style={{
+                            margin: "auto",
+                            textAlign: "center",
+                            marginTop: "40px",
+                        }}
+                        id="upload-button"
+                    ></div>
+                    <div
+                        id="midi-player"
+                        style={{
+                            margin: "auto",
+                            textAlign: "center",
+                            marginTop: "40px",
+                        }}
+                    ></div>
                 </div>
                 <div
                     style={{
                         margin: "auto",
-                        textAlign: "center",
-                        marginTop: "40px",
+                        width: "min-content",
+                        marginTop: "240px", // non-responsive sizing but should look fine on a 1920 x 1080 screen
                     }}
-                    id="upload-button"
-                ></div>
-                <div
-                    id="midi-player"
-                    style={{
-                        margin: "auto",
-                        textAlign: "center",
-                        marginTop: "40px",
-                    }}
+                    id="load-spinner"
                 ></div>
             </div>
         );
