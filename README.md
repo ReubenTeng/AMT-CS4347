@@ -1,4 +1,4 @@
-# ALT-AMT-CS4347
+# AMT-CS4347
 Automatic lyrics and melody trascriber for CS4347
 This project is divided into two components, a back-end served by FastAPI and uvicorn, and a front-end built on React. 
 
